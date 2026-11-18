@@ -37,6 +37,7 @@ class Experiment:
     noise: float = 0.0
     seed: int = 0
     start_from: tuple = ()  # optional initial route index per driver
+    toll: float = 0.0  # bridge toll, in minutes a driver would pay to avoid; changes choices, not trip times
 
 
 def link_times(counts: dict[str, int]) -> dict[str, float]:
@@ -67,7 +68,7 @@ def run(exp: Experiment) -> dict:
         history.append({"day": day, "counts": counts,
                         "times": {r: round(times[r], 2) for r in names},
                         "avg": round(avg, 2)})
-        t = np.array([times[r] for r in names])
+        t = np.array([times[r] + (exp.toll if r == "bridge" else 0.0) for r in names])  # what drivers weigh
         if exp.noise > 0:
             w = np.exp(-(t - t.min()) / exp.noise)
             p = w / w.sum()
@@ -110,6 +111,9 @@ if __name__ == "__main__":
         for seed in range(5):
             r = run(Experiment(f"demand_{drivers}_bridge_long", drivers=drivers, bridge=True, days=200, seed=seed))
             runs.append(r)
+    for toll in [0, 5, 10, 15, 20, 22.5, 25, 30]:
+        for seed in range(5):
+            runs.append(run(Experiment(f"toll_{toll:g}", bridge=True, toll=toll, days=120, seed=seed)))
     for seed in range(5):
         smart = run(Experiment("relapse_phase1_smart", bridge=True, seed=seed))
         guess = run(Experiment("relapse_phase2_guessing", bridge=True, noise=1e9, days=30, seed=seed,

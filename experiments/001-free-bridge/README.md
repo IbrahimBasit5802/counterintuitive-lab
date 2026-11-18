@@ -18,6 +18,7 @@ This is the network from Dietrich Braess's 1968 paper. The drivers and their day
 - A **narrow road** takes 1 minute per 100 cars on it.
 - A **motorway** always takes 45 minutes.
 - The **bridge**, when it exists, takes 0 minutes.
+- An optional **toll** on the bridge is added to what drivers weigh, not to their trip time.
 - Each morning, every driver re-plans with probability 10%. A perfect driver moves to yesterday's fastest route, with a chance that grows with the minutes it would save (full chance at 5 minutes). A noisy driver picks a route by logit choice, so small differences fool them more often than big ones.
 
 ## Results (5 random seeds each, average over the last 10 days)
@@ -42,6 +43,19 @@ Town size changes everything:
 | 4,000 | 65 | 80 |
 | 5,000 | 70 | 90 |
 | 6,000 | 75 | 90 |
+
+A toll on the bridge (counted in minutes; it changes choices, not trip times):
+
+| Toll | Average commute | Drivers on the bridge |
+|---|---|---|
+| none | 80.0 min | 4,000 |
+| 10 min | 72.5 min | 3,000 |
+| 15 min | 67.5 min | 2,000 |
+| 20 min | 65.0 min | 1,000 |
+| 22.5 min | 64.7 min | 500 |
+| 25 min or more | 65.0 min | 0 |
+
+The best result is not removing the bridge: pricing it so about 500 drivers use it beats the town with no bridge.
 
 These match the equilibria you can work out by hand: 45 + N/200 minutes without the bridge, and N/50 (capped at 90) with it.
 
